@@ -131,7 +131,7 @@ def operations(intent_request):
         return close({}, 
                  'Fulfilled',
                  {'contentType': 'PlainText',
-                 'content': 'You must be a valid user to use this bot. ' + str(userid)+str(output_session_attributes.get('is_authorized_user'))})
+                 'content': 'You must be a valid user to use this bot. ' })
  
     application_name = intent_request['currentIntent']['slots']['Application']
     environment_name = intent_request['currentIntent']['slots']['Environment']
