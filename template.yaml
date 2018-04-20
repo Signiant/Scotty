@@ -17,7 +17,7 @@ Resources:
       MemorySize: 128
       Timeout: 30
       Role: !GetAtt ExecutionRole.Arn
-
+      
   LambdaInvokePermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -77,9 +77,9 @@ Resources:
                   - !Ref Route53ZoneArn
               # describe ELB     
               - 
-                 Effect: "Allow"
-                 Action:
-                   - "elasticloadbalancing:DescribeLoadBalancerAttributes"
-                   - "elasticloadbalancing:DescribeTags"
-                 Resource: 
-                   - "*" 
+                Effect: "Allow"
+                Action:
+                  - "elasticloadbalancing:DescribeLoadBalancerAttributes"
+                  - "elasticloadbalancing:DescribeTags"
+                Resource: 
+                  - "*" 
