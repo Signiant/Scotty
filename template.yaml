@@ -81,6 +81,7 @@ Resources:
                 Action:
                   - "elasticloadbalancing:DescribeLoadBalancerAttributes"
                   - "elasticloadbalancing:DescribeTags"
+                  - "elasticloadbalancing:DescribeLoadBalancers"
                 Resource: 
                   - "*" 
               # get and set slots     
