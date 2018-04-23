@@ -83,3 +83,12 @@ Resources:
                   - "elasticloadbalancing:DescribeTags"
                 Resource: 
                   - "*" 
+              # get and set slots     
+              - 
+                Effect: "Allow"
+                Action:
+                  - "lex:GetSlotType"
+                  - "lex:GetSlotTypes"
+                  - "lex:PutSlotType"
+                Resource: 
+                  - "*" 
