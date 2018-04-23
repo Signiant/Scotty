@@ -1,0 +1,12 @@
+{
+    "enumerationValues": [
+        {
+            "value": "no"
+        }, 
+        {
+            "value": "yes"
+        }
+    ], 
+    "name": "Confirm", 
+    "description": "Optional Confirm"
+}

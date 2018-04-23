@@ -1,0 +1,95 @@
+{
+    "dialogCodeHook": {
+        "uri": "arn:aws:lambda:us-east-1:135040612542:function:botLoadBalancerSwitcher", 
+        "messageVersion": "1.0"
+    },
+    "name": "LBswitcher", 
+    "sampleUtterances": [
+        "scotty switch", 
+        "switch load balancer", 
+        "scotty switch {Application}", 
+        "switch"
+    ], 
+    "slots": [
+        {
+            "slotType": "ApplicationEnvironment", 
+            "name": "Environment", 
+            "slotConstraint": "Required", 
+            "valueElicitationPrompt": {
+                "maxAttempts": 2, 
+                "messages": [
+                    {
+                        "content": "What environment?", 
+                        "contentType": "PlainText"
+                    }
+                ]
+            }, 
+            "priority": 2, 
+            "slotTypeVersion": "$LATEST", 
+            "sampleUtterances": []
+        }, 
+        {
+            "slotType": "Confirm", 
+            "name": "Confirmation", 
+            "slotConstraint": "Required", 
+            "valueElicitationPrompt": {
+                "maxAttempts": 2, 
+                "messages": [
+                    {
+                        "content": "Are you sure you want to switch to {Environment}?", 
+                        "contentType": "PlainText"
+                    }
+                ], 
+                "responseCard": "{\"version\":1,\"contentType\":\"application/vnd.amazonaws.card.generic\",\"genericAttachments\":[{\"subTitle\":\"yes/no\",\"title\":\"Confirmation run on {Environment}?\",\"buttons\":[{\"text\":\"Yes\",\"value\":\"yes\"},{\"text\":\"No\",\"value\":\"no\"}]}]}"
+            }, 
+            "priority": 4, 
+            "slotTypeVersion": "$LATEST", 
+            "sampleUtterances": []
+        }, 
+        {
+            "slotType": "EbApplication", 
+            "name": "Application", 
+            "slotConstraint": "Required", 
+            "valueElicitationPrompt": {
+                "maxAttempts": 2, 
+                "messages": [
+                    {
+                        "content": "What application?", 
+                        "contentType": "PlainText"
+                    }
+                ], 
+                "responseCard": "{\"version\":1,\"contentType\":\"application/vnd.amazonaws.card.generic\",\"genericAttachments\":[]}"
+            }, 
+            "priority": 1, 
+            "slotTypeVersion": "$LATEST", 
+            "sampleUtterances": [
+                "scotty switch {Application}"
+            ]
+        }, 
+        {
+            "slotType": "SwitchReasons", 
+            "name": "Reason", 
+            "slotConstraint": "Required", 
+            "valueElicitationPrompt": {
+                "maxAttempts": 2, 
+                "messages": [
+                    {
+                        "content": "Reason for switch?", 
+                        "contentType": "PlainText"
+                    }
+                ], 
+                "responseCard": "{\"version\":1,\"contentType\":\"application/vnd.amazonaws.card.generic\",\"genericAttachments\":[{\"subTitle\":\"Your pick\",\"title\":\"Reason\",\"buttons\":[{\"text\":\"New Code\",\"value\":\"NewCode\"},{\"text\":\"HotFix\",\"value\":\"HotFix\"},{\"text\":\"Rollback\",\"value\":\"Rollback\"},{\"text\":\"Other\",\"value\":\"Other\"}]}]}"
+            }, 
+            "priority": 3, 
+            "slotTypeVersion": "$LATEST", 
+            "sampleUtterances": []
+        }
+    ],
+    "fulfillmentActivity": {
+        "type": "CodeHook", 
+        "codeHook": {
+            "uri": "arn:aws:lambda:us-east-1:135040612542:function:botLoadBalancerSwitcher", 
+            "messageVersion": "1.0"
+        }
+    }
+}

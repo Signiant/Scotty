@@ -1,0 +1,18 @@
+{
+    "enumerationValues": [
+        {
+            "value": "NewCode"
+        }, 
+        {
+            "value": "HotFix"
+        }, 
+        {
+            "value": "Rollback"
+        }, 
+        {
+            "value": "Other"
+        }
+    ], 
+    "name": "SwitchReasons", 
+    "description": "Reasons to switch live Load balancer"
+}
