@@ -5,6 +5,13 @@ Description: Lambda function for scotty lex bot.
 Parameters:
   Route53ZoneArn: 
     Type: String
+  Route53ZoneArn2: 
+    Type: String
+  Route53ZoneArn3: 
+    Type: String
+  Route53ZoneArn4: 
+    Type: String
+  
 
 Resources:
   scottybotlambda:
@@ -75,6 +82,9 @@ Resources:
                   - "route53:ChangeResourceRecordSets"
                 Resource:
                   - !Ref Route53ZoneArn
+                  - !Ref Route53ZoneArn2
+                  - !Ref Route53ZoneArn3
+                  - !Ref Route53ZoneArn4
               # describe ELB     
               - 
                 Effect: "Allow"
