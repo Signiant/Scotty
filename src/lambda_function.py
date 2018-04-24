@@ -296,14 +296,16 @@ def get_hostedzone_balancers(config, appname,intent_request):
 
 def get_running_env(region, loadbalancerdns) : 
     client = boto3.client('elb', region_name=region) 
-    response = client.describe_load_balancers()
-    for loadbalancer in response.get('LoadBalancerDescriptions'):
-        if loadbalancer.get('DNSName').lower() in loadbalancerdns:
-            tagresponse = client.describe_tags(LoadBalancerNames=[loadbalancer.get('LoadBalancerName')])
-            tags = tagresponse.get('TagDescriptions')[0].get('Tags')
-            for tag in tags:
-                if tag.get('Key') == 'elasticbeanstalk:environment-name':  
-                    return tag.get('Value') #environment
+    paginator = client.get_paginator('describe_load_balancers')
+    page_iterator = paginator.paginate()
+    for page in page_iterator:
+        for loadbalancer in page.get('LoadBalancerDescriptions'):
+            if loadbalancer.get('DNSName').lower() in loadbalancerdns:
+                tagresponse = client.describe_tags(LoadBalancerNames=[loadbalancer.get('LoadBalancerName')])
+                tags = tagresponse.get('TagDescriptions')[0].get('Tags')
+                for tag in tags:
+                    if tag.get('Key') == 'elasticbeanstalk:environment-name':
+                        return tag.get('Value') #environment-name
                     
 
 def get_new_lb_target(output_session_attributes, environment_name):
