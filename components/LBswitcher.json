@@ -29,7 +29,7 @@
             "sampleUtterances": []
         }, 
         {
-            "slotType": "Confirm", 
+            "slotType": "ConfirmScotty", 
             "name": "Confirmation", 
             "slotConstraint": "Required", 
             "valueElicitationPrompt": {
