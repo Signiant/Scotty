@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Lambda function for scotty lex bot.
+
+Parameters:
+  Route53ZoneArn: 
+    Type: String
+  
+
+Resources:
+  scottybotlambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: ./src
+      Description: Lambda function for scotty lex bot to change dns route.
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt ExecutionRole.Arn
+      
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: lex.amazonaws.com
+      FunctionName: !GetAtt scottybotlambda.Arn
+
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+      Policies:
+        -
+          PolicyName: "ScottyPolicies"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # Cloudwatch logs for the function
+              -
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "logs:DescribeLogStreams"
+                Resource:
+                  - "*"
+              # read EB
+              -
+                Effect: "Allow"
+                Action:
+                  - "elasticbeanstalk:DescribeApplications"
+                  - "elasticbeanstalk:DescribeEnvironments"
+                  - "elasticbeanstalk:DescribeEnvironmentResources"
+                  - "elasticbeanstalk:DescribeEvents"
+                  - "autoscaling:DescribeAutoScalingGroups"
+                  - "autoscaling:UpdateAutoScalingGroup"
+                Resource:
+                  - "*"
+              # read and change route53
+              - 
+                Effect: "Allow"
+                Action:
+                  - "route53:ListResourceRecordSets"
+                  - "route53:ChangeResourceRecordSets"
+                Resource:
+                  - !Ref Route53ZoneArn
+              # describe ELB     
+              - 
+                Effect: "Allow"
+                Action:
+                  - "elasticloadbalancing:DescribeLoadBalancerAttributes"
+                  - "elasticloadbalancing:DescribeTags"
+                  - "elasticloadbalancing:DescribeLoadBalancers"
+                Resource: 
+                  - "*" 
+              # get and set slots     
+              - 
+                Effect: "Allow"
+                Action:
+                  - "lex:GetSlotType"
+                  - "lex:GetSlotTypes"
+                  - "lex:PutSlotType"
+                Resource: 
+                  - "*" 
