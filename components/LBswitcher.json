@@ -25,7 +25,7 @@
                 ]
             }, 
             "priority": 2, 
-            "slotTypeVersion": "$LATEST", 
+            "slotTypeVersion": "1", 
             "sampleUtterances": []
         }, 
         {
@@ -61,7 +61,7 @@
                 "responseCard": "{\"version\":1,\"contentType\":\"application/vnd.amazonaws.card.generic\",\"genericAttachments\":[]}"
             }, 
             "priority": 1, 
-            "slotTypeVersion": "$LATEST", 
+            "slotTypeVersion": "1", 
             "sampleUtterances": [
                 "scotty switch {Application}"
             ]
