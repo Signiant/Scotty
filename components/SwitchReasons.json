@@ -14,5 +14,5 @@
         }
     ], 
     "name": "SwitchReasons", 
-    "description": "Reasons to switch live Load balancer"
+    "description": "Reasons to switch live Application Environment"
 }
