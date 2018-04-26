@@ -161,7 +161,7 @@ def operations(intent_request):
                 intent_request['currentIntent']['name'],
                 intent_request['currentIntent']['slots'],
                 'Application',
-                {'contentType': 'PlainText', 'content': 'Application to switch?' }, #+str(userid) +str(validateduser)
+                {'contentType': 'PlainText', 'content': 'Application to switch?' }, 
                 build_response_card('', '', card)
             )
             
@@ -207,7 +207,7 @@ def operations(intent_request):
                 intent_request['currentIntent']['name'],
                 intent_request['currentIntent']['slots'],
                 'Environment',
-                {'contentType': 'PlainText', 'content': 'What environment would you like to switch to?'+str(application_name)},
+                {'contentType': 'PlainText', 'content': 'What environment would you like to switch to for '+str(application_name) +'?'},
                 build_response_card('Currently running on ' + running_env , 'Pick environment to run on' , card ) 
                 )
       
