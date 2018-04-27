@@ -1,6 +1,6 @@
 {
     "dialogCodeHook": {
-        "uri": "arn:aws:lambda:us-east-1:135040612542:function:botLoadBalancerSwitcher", 
+        "uri": "", 
         "messageVersion": "1.0"
     },
     "name": "LBswitcher", 
@@ -88,7 +88,7 @@
     "fulfillmentActivity": {
         "type": "CodeHook", 
         "codeHook": {
-            "uri": "arn:aws:lambda:us-east-1:135040612542:function:botLoadBalancerSwitcher", 
+            "uri": "", 
             "messageVersion": "1.0"
         }
     }
