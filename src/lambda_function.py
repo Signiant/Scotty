@@ -127,11 +127,11 @@ def operations(intent_request):
             except Exception:
                 pass
 
-    # if (output_session_attributes.get('is_authorized_user') is None) or ('True' not  in (output_session_attributes.get('is_authorized_user')) ) :  #intentrequest holds strings
-    #     return close({}, 
-    #              'Fulfilled',
-    #              {'contentType': 'PlainText',
-    #              'content': 'You must be a valid user to use this bot. ' })
+    if (output_session_attributes.get('is_authorized_user') is None) or ('True' not  in (output_session_attributes.get('is_authorized_user')) ) :  #intentrequest holds strings
+        return close({}, 
+                 'Fulfilled',
+                 {'contentType': 'PlainText',
+                 'content': 'You must be a valid user to use this bot. ' })
  
     application_name = intent_request['currentIntent']['slots']['Application']
     environment_name = intent_request['currentIntent']['slots']['Environment']
@@ -147,7 +147,7 @@ def operations(intent_request):
 
         if not application_name:
            
-            client = boto3.client('elasticbeanstalk', region_name='us-east-1') #update to handle multi env
+            client =  boto3.client('elasticbeanstalk', region_name=config.get('Region')) 
             response = client.describe_applications( )
             card=[]
             slot=[]
