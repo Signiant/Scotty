@@ -1,0 +1,22 @@
+{
+  "currentIntent": {
+    "slots": {
+      "Confirmation": "no",
+      "Application": "",
+      "Environment": "",
+      "Reason": "Other"
+    },
+    "name": "LBswitcher",
+    "confirmationStatus": "None"
+  },
+  "bot": {
+    "alias": "$LATEST",
+    "version": "$LATEST",
+    "name": "ScottyBot"
+  },
+  "userId": “Scotty”,
+  "invocationSource": "DialogCodeHook",
+  "outputDialogMode": "Text",
+  "messageVersion": "1.0",
+  "sessionAttributes": {}
+}
