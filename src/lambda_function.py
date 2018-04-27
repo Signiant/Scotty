@@ -126,7 +126,7 @@ def operations(intent_request):
                     intent_request['sessionAttributes']['is_authorized_user']='False'
             except Exception:
                 pass
-
+    #comment out to skip validation in the lex console
     if (output_session_attributes.get('is_authorized_user') is None) or ('True' not  in (output_session_attributes.get('is_authorized_user')) ) :  #intentrequest holds strings
         return close({}, 
                  'Fulfilled',
@@ -138,8 +138,8 @@ def operations(intent_request):
     reason = intent_request['currentIntent']['slots']['Reason']
     confirm = intent_request['currentIntent']['slots']['Confirmation']
 
-    #application_name=None #test: if not application_name:
-    #environment_name=None #test: if application_name and not environment_name:
+    #application_name=None #debug: if not application_name:
+    #environment_name=None #debug: if application_name and not environment_name:
     source = intent_request['invocationSource']
 
     if source == 'DialogCodeHook':
