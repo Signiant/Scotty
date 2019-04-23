@@ -1,8 +1,96 @@
 #! python3
 import boto3
-import argparse
-
+import time
 from pprint import pprint
+
+
+def updateBot(lex, updatedSlotVersion):
+    bot = lex.get_bot(
+        name='Scotty',
+        versionOrAlias="$LATEST"
+    )
+    intentVersion = []
+    intentName = []
+    for intent in bot['intents']:
+        newIntent = lex.get_intent(name=intent['intentName'], version="$LATEST")
+        for i in range(len(newIntent['slots'])):
+            if "table" == newIntent['slots'][i]['name']:
+                newIntent['slots'][i]['slotTypeVersion'] = updatedSlotVersion
+                putIntent(lex, newIntent)
+                version = publishIntent(lex, newIntent)
+                intentVersion.append({'intentName': intent['intentName'], 'intentVersion': version})
+                intentName.append(intent['intentName'])
+
+        if intent['intentName'] not in intentName:
+            intentVersion.append({'intentName': intent['intentName'], 'intentVersion': intent['intentVersion']})
+    # pprint(intentVersion)
+    checksum = putbot(lex, bot, intentVersion)
+    return publishbot(lex, bot, checksum)
+
+
+def putIntent(lex, intents):
+    lex.put_intent(
+        name=intents['name'],
+        description=intents['description'],
+        slots=intents['slots'],
+        sampleUtterances=intents['sampleUtterances'],
+        dialogCodeHook=intents['dialogCodeHook'],
+        fulfillmentActivity=intents['fulfillmentActivity'],
+        checksum=intents['checksum']
+    )
+
+
+
+def publishIntent(lex, intent):
+    newIntent = lex.get_intent(
+        name=intent['name'],
+        version="$LATEST"
+    )
+
+    response = lex.create_intent_version(
+        name=intent['name'],
+        checksum=newIntent.get('checksum')
+    )
+    return response['version']
+
+
+def putbot(lex, bot, intent):
+    response = lex.put_bot(
+        name=bot['name'],
+        description=bot['description'],
+        intents=intent,
+        clarificationPrompt=bot['clarificationPrompt'],
+        abortStatement=bot['abortStatement'],
+        idleSessionTTLInSeconds=60,
+        voiceId="Ivy",
+        processBehavior="BUILD",
+        locale="en-US",
+        childDirected=False,
+        createVersion=False,
+        checksum=bot.get("checksum")
+    )
+    bot_status = response.get('status')
+    checksum = response.get('checksum')
+    # Wait for BOT status to be READY
+    while 'READY' not in bot_status:
+        bot = lex.get_bot(
+            name=bot['name'],
+            versionOrAlias='$LATEST'
+        )
+        bot_status = bot.get('status')
+        checksum = bot.get('checksum')
+        print('   Not ready yet...')
+        time.sleep(5)
+    return checksum
+
+
+def publishbot(lex, bot, checksum):
+    print('Publishing new Bot Version')
+    result = False
+    response = lex.create_bot_version(name=bot['name'], checksum=checksum)
+    if 'ResponseMetadata' in response and response['ResponseMetadata']['HTTPStatusCode'] == 201:
+        result = True
+    return result
 
 
 # Updating the existing slot if the any changes has occured in Dynamo DB
@@ -23,7 +111,7 @@ def lambda_handler(event, context):  # event, context
             tablelist.append(table)
     # coverting the list to set
     set_table_name = set(tablelist)
-    pprint(set_table_name)
+    # pprint(set_table_name)
     lex = boto3.client('lex-models')
     # Getting the current slot Type for tables
     current_slot = lex.get_slot_type(
@@ -63,11 +151,15 @@ def lambda_handler(event, context):  # event, context
             name="table",
             version="$LATEST"
         )
-        responses_slot = lex.create_slot_type_version(
+        updatedSlotVersion = lex.create_slot_type_version(
             name="table",
             checksum=slot.get('checksum')
-        )
-        pprint("Table List has been updated!")
+        )['version']
+
+        if updateBot(lex, updatedSlotVersion):
+            print("Table List has been updated!")
+        else:
+            print("The bot couldnt be updated!")
     else:
         print("No change were made to the slots")
 
