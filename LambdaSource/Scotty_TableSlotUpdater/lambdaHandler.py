@@ -1,34 +1,35 @@
 #! python3
 import boto3
 import time
+
 from pprint import pprint
 
 
-def updateBot(lex, updatedSlotVersion):
+def updateSlot(lex, updatedSlotVersion):
     bot = lex.get_bot(
         name='Scotty',
         versionOrAlias="$LATEST"
     )
+
     intentVersion = []
-    intentName = []
     for intent in bot['intents']:
+        updated_intent = {'intentName': intent['intentName'], 'intentVersion': intent['intentVersion']}
         newIntent = lex.get_intent(name=intent['intentName'], version="$LATEST")
-        for i in range(len(newIntent['slots'])):
-            if "table" == newIntent['slots'][i]['name']:
-                newIntent['slots'][i]['slotTypeVersion'] = updatedSlotVersion
+        for slot in newIntent['slots']:
+            if slot['name'] == "table":
+                slot['slotTypeVersion'] = updatedSlotVersion
                 putIntent(lex, newIntent)
                 version = publishIntent(lex, newIntent)
-                intentVersion.append({'intentName': intent['intentName'], 'intentVersion': version})
-                intentName.append(intent['intentName'])
+                updated_intent['intentVersion'] = version
+                break
+        intentVersion.append(updated_intent)
 
-        if intent['intentName'] not in intentName:
-            intentVersion.append({'intentName': intent['intentName'], 'intentVersion': intent['intentVersion']})
-    # pprint(intentVersion)
     checksum = putbot(lex, bot, intentVersion)
     return publishbot(lex, bot, checksum)
 
 
 def putIntent(lex, intents):
+
     lex.put_intent(
         name=intents['name'],
         description=intents['description'],
@@ -42,6 +43,7 @@ def putIntent(lex, intents):
 
 
 def publishIntent(lex, intent):
+
     newIntent = lex.get_intent(
         name=intent['name'],
         version="$LATEST"
@@ -55,6 +57,7 @@ def publishIntent(lex, intent):
 
 
 def putbot(lex, bot, intent):
+
     response = lex.put_bot(
         name=bot['name'],
         description=bot['description'],
@@ -66,7 +69,6 @@ def putbot(lex, bot, intent):
         processBehavior="BUILD",
         locale="en-US",
         childDirected=False,
-        createVersion=False,
         checksum=bot.get("checksum")
     )
     bot_status = response.get('status')
@@ -85,6 +87,7 @@ def putbot(lex, bot, intent):
 
 
 def publishbot(lex, bot, checksum):
+
     print('Publishing new Bot Version')
     result = False
     response = lex.create_bot_version(name=bot['name'], checksum=checksum)
@@ -122,17 +125,11 @@ def lambda_handler(event, context):  # event, context
     #  creating a set of existing table in the slot type
     table_in_slot = set(current_slot['enumerationValues'][0]['synonyms'])
 
-    # A union of tables in current table in dynamoDb to table name in slot type
-    # difference = set of table that are not in table in slot type
-    # addition is the opposite
-
-    difference = table_in_slot - set_table_name
-    Addition = set_table_name - table_in_slot
-    Number_of_change = len(difference)
-    Number_of_add = len(Addition)
+    tableRemoved = len(table_in_slot - set_table_name)
+    tableAdded = len(set_table_name - table_in_slot)
 
     # if the number of changes in a table is greater than 0: update the current list in slot type
-    if Number_of_change is not 0 or Number_of_add is not 0:
+    if tableRemoved is not 0 or tableAdded is not 0:
         response = lex.put_slot_type(
             name="table",
             description="tables in dynamodb",
@@ -143,8 +140,7 @@ def lambda_handler(event, context):  # event, context
                 }
             ],
             valueSelectionStrategy='TOP_RESOLUTION',
-            checksum=current_slot.get('checksum'),
-            createVersion=False
+            checksum=current_slot.get('checksum')
         )
 
         slot = lex.get_slot_type(
@@ -156,7 +152,7 @@ def lambda_handler(event, context):  # event, context
             checksum=slot.get('checksum')
         )['version']
 
-        if updateBot(lex, updatedSlotVersion):
+        if updateSlot(lex, updatedSlotVersion):
             print("Table List has been updated!")
         else:
             print("The bot couldnt be updated!")

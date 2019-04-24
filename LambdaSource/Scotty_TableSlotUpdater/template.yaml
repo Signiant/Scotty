@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: A schedule lambda to update the Table Slot type (nightly) for the scotty bot
+Description: A schedule lambda to update the Table Slot type (nightly) for the scotty1 bot
 
 Resources:
     ExecutionRole:
