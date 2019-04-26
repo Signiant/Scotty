@@ -38,6 +38,12 @@ Resources:
                                 Action:
                                     - "dynamodb:ListTables"
                                     - "lambda:InvokeFunction"
+                                    - "lex:GetBot"
+                                    - "lex:PutBot"
+                                    - "Lex:CreateBotVersion"
+                                    - "lex:CreateIntentVersion"
+                                    - "lex:GetIntent",
+                                    - "lex:PutIntent"
                                     - "lex:GetSlotType"
                                     - "lex:PutSlotType"
                                     - "lex:CreateSlotTypeVersion"

@@ -29,7 +29,6 @@ def updateSlot(lex, updatedSlotVersion):
 
 
 def putIntent(lex, intents):
-
     lex.put_intent(
         name=intents['name'],
         description=intents['description'],
@@ -41,9 +40,7 @@ def putIntent(lex, intents):
     )
 
 
-
 def publishIntent(lex, intent):
-
     newIntent = lex.get_intent(
         name=intent['name'],
         version="$LATEST"
@@ -57,7 +54,6 @@ def publishIntent(lex, intent):
 
 
 def putbot(lex, bot, intent):
-
     response = lex.put_bot(
         name=bot['name'],
         description=bot['description'],
@@ -87,7 +83,6 @@ def putbot(lex, bot, intent):
 
 
 def publishbot(lex, bot, checksum):
-
     print('Publishing new Bot Version')
     result = False
     response = lex.create_bot_version(name=bot['name'], checksum=checksum)
@@ -96,9 +91,7 @@ def publishbot(lex, bot, checksum):
     return result
 
 
-# Updating the existing slot if the any changes has occured in Dynamo DB
-def lambda_handler(event, context):  # event, context
-
+def reactToDynamoDB():
     client = boto3.client("dynamodb")
     paginator = client.get_paginator('list_tables')
     # get all the list of table in the current environment
@@ -125,11 +118,13 @@ def lambda_handler(event, context):  # event, context
     #  creating a set of existing table in the slot type
     table_in_slot = set(current_slot['enumerationValues'][0]['synonyms'])
 
-    tableRemoved = len(table_in_slot - set_table_name)
-    tableAdded = len(set_table_name - table_in_slot)
+    difference = table_in_slot - set_table_name
+    Addition = set_table_name - table_in_slot
+    Number_of_change = len(difference)
+    Number_of_add = len(Addition)
 
     # if the number of changes in a table is greater than 0: update the current list in slot type
-    if tableRemoved is not 0 or tableAdded is not 0:
+    if Number_of_change is not 0 or Number_of_add is not 0:
         response = lex.put_slot_type(
             name="table",
             description="tables in dynamodb",
@@ -153,12 +148,21 @@ def lambda_handler(event, context):  # event, context
         )['version']
 
         if updateSlot(lex, updatedSlotVersion):
-            print("Table List has been updated!")
+            print("Table list has been updated!")
         else:
-            print("The bot couldnt be updated!")
+            print("The bot couldn't be updated!")
     else:
         print("No change were made to the slots")
 
 
+# Updating the existing slot if the any changes has occured in Dynamo DB
+def lambda_handler(event, context):  # event, context
+
+    if event['detail']['eventName'] == 'CreateTable' or event['detail']['eventName'] == 'DeleteTable':
+        reactToDynamoDB()
+    else:
+        print('No updates!')
+
+
 if __name__ == "__main__":
-    lambda_handler({}, None)
+    reactToDynamoDB()
